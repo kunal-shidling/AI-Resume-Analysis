@@ -1,0 +1,9 @@
+- [x] Fix component name: upload -> Upload
+- [x] Fix state setters: IsProcessing -> setIsProcessing, StatusText -> setStatusText
+- [x] Add import for usePuterStore from '~/lib/putter'
+- [x] Use usePuterStore in the component to access fs and ai
+- [x] Fix handleAnalyze: correct type file: File, use setIsProcessing, use fs.upload from store, add analysis logic with ai.feedback
+- [x] Fix handleSubmit: correct formData.get for jobTitle and jobDescription, handle null values, await handleAnalyze
+- [x] Fix JSX spacing: remove space in {! isProcessing &&
+- [x] Add error handling for upload and analysis
+- [x] Test the component by running the app

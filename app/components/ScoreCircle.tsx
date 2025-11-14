@@ -1,13 +1,14 @@
-const ScoreCircle = ({ score = 75 }: { score: number }) => {
-    const radius = 40;
-    const stroke = 8;
+const ScoreCircle = ({ score = 75, size = "large" }: { score: number; size?: "small" | "large" }) => {
+    const radius = size === "small" ? 30 : 40;
+    const stroke = size === "small" ? 6 : 8;
     const normalizedRadius = radius - stroke / 2;
     const circumference = 2 * Math.PI * normalizedRadius;
     const progress = score / 100;
     const strokeDashoffset = circumference * (1 - progress);
-  
+    const svgSize = size === "small" ? "75px" : "100px";
+
     return (
-      <div className="relative w-[100px] h-[100px]">
+      <div className={`relative ${size === "small" ? "w-[75px] h-[75px]" : "w-[100px] h-[100px]"}`}>
         <svg
           height="100%"
           width="100%"
@@ -42,10 +43,10 @@ const ScoreCircle = ({ score = 75 }: { score: number }) => {
             strokeLinecap="round"
           />
         </svg>
-  
+
         {/* Score and issues */}
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="font-semibold text-sm">{`${score}/100`}</span>
+          <span className={`font-semibold ${size === "small" ? "text-xs" : "text-sm"}`}>{`${score}/100`}</span>
         </div>
       </div>
     );
