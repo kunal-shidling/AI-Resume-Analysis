@@ -32,6 +32,20 @@ export function Layout({ children }: { children: React.ReactNode }) {
     init()
   }, [init]);
 
+  useEffect(() => {
+    // Suppress Chrome extension connection errors
+    const originalError = console.error;
+    console.error = (...args) => {
+      if (args[0] && typeof args[0] === 'string' && args[0].includes('Could not establish connection')) {
+        return;
+      }
+      originalError.apply(console, args);
+    };
+    return () => {
+      console.error = originalError;
+    };
+  }, []);
+
 
   return (
     <html lang="en">

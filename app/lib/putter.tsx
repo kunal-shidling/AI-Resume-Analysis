@@ -1,5 +1,22 @@
 import { create } from "zustand";
 
+export interface Feedback {
+  summary: string;
+  ATS: {
+    score: number;
+    tips: string[];
+  };
+  details: {
+    score: number;
+    sections: {
+      title: string;
+      score: number;
+      feedback: string;
+      suggestions: string[];
+    }[];
+  };
+}
+
 declare global {
   interface Window {
     puter: {
