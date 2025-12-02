@@ -14,7 +14,7 @@ const ATS = ({ score, suggestions }: ATSProps) => {
   let gradientClasses = ''
   let iconSrc = ''
 
-  if (score > 69) {
+  if (score > 70) {
     gradientClasses = 'bg-gradient-to-r from-green-100 to-green-200'
     iconSrc = '/icons/ats-good.svg'
   } else if (score > 49) {

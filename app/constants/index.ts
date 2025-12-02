@@ -228,21 +228,36 @@ export const resumes: Resume[] = [
   export const prepareInstructions = ({
     jobTitle,
     jobDescription,
-    
+    resumeText,
   }: {
     jobTitle: string;
     jobDescription: string;
-    
+    resumeText: string;
   }) =>
     `You are an expert in ATS (Applicant Tracking System) and resume analysis.
+    
+    Here is the resume content to analyze:
+    
+    ${resumeText}
+    
     Please analyze and rate this resume and suggest how to improve it.
     The rating can be low if the resume is bad.
     Be thorough and detailed. Don't be afraid to point out any mistakes or areas for improvement.
     If there is a lot to improve, don't hesitate to give low scores. This is to help the user to improve their resume.
-    If available, use the job description for the job user is applying to to give more detailed feedback.
-    If provided, take the job description into consideration.
-    The job title is: ${jobTitle}
-    The job description is: ${jobDescription}
-    Provide the feedback using the following format: ${AIResponseFormat}
-    Return the analysis as a JSON object, without any other text and without the backticks.
-    Do not include any other text or comments.`;
+    
+    Job details for context:
+    - Job Title: ${jobTitle}
+    - Job Description: ${jobDescription}
+    
+    Use the job description to give more targeted feedback on how well the resume matches the role.
+    
+    CRITICAL: You MUST return ONLY a valid JSON object in the following exact format:
+    ${AIResponseFormat}
+    
+    RULES:
+    1. Return ONLY the JSON object, no other text
+    2. Do not include markdown code blocks or backticks
+    3. Do not include any explanatory text before or after the JSON
+    4. Ensure all JSON is properly formatted and valid
+    5. All scores must be numbers between 0-100
+    6. All tips arrays must contain 3-4 items`;

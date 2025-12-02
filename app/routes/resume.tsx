@@ -12,41 +12,55 @@ export const meta = () => ([
 ]);
 
 const Resume = () => {
-  const { auth, isLoading, fs, kv } = usePuterStore();
+  const { auth, isLoading, fs, kv, puterReady } = usePuterStore();
   const { id } = useParams();
+  const navigate = useNavigate();
 
   const [imageUrl, setImageUrl] = useState("");
   const [resumeUrl, setResumeUrl] = useState("");
   const [feedback, setFeedback] = useState<Feedback | null>(null);
 
-  const navigate = useNavigate();
-
+  // Redirection path corrected
   useEffect(() => {
     if (!isLoading && !auth.isAuthenticated) {
-      navigate(`/auth?next=/resume${id}`);
+      navigate(`/auth?next=/resume/${id}`);
     }
-  }, [isLoading]);
+  }, [isLoading, auth.isAuthenticated, navigate, id]);
 
+  // Load resume and feedback
   useEffect(() => {
+    if (!puterReady) return;
+
     const loadResume = async () => {
       try {
         const resume = await kv.get(`resume:${id}`);
-        if (!resume) return;
+        if (!resume) {
+          console.warn('No resume found for id:', id);
+          return;
+        }
 
         const data = JSON.parse(resume);
+        console.log('Resume data loaded:', data);
 
+        // PDF Blob
         const resumeBlob = await fs.read(data.resumePath);
-        if (!resumeBlob) return;
+        if (!resumeBlob) {
+          console.error('Failed to read resume blob');
+          return;
+        }
 
         const pdfBlob = new Blob([resumeBlob], { type: "application/pdf" });
-        const url = URL.createObjectURL(pdfBlob);
-        setResumeUrl(url);
+        const pdfUrl = URL.createObjectURL(pdfBlob);
+        setResumeUrl(pdfUrl);
+        console.log('PDF URL created:', pdfUrl);
 
+        // Image preview if available
         if (data.imagePath) {
-          const imageBlob = await fs.read(data.imagePath);
-          if (imageBlob) {
-            const imgUrl = URL.createObjectURL(imageBlob);
+          const imgBlob = await fs.read(data.imagePath);
+          if (imgBlob) {
+            const imgUrl = URL.createObjectURL(imgBlob);
             setImageUrl(imgUrl);
+            console.log('Image URL created:', imgUrl);
           }
         }
 
@@ -57,11 +71,15 @@ const Resume = () => {
     };
 
     loadResume();
-  }, [id]);
+  }, [id, puterReady, fs, kv]);
+
+  // Wait for puter to load before rendering
+  if (!puterReady) {
+    return <p className="text-center p-10">Loading environment...</p>;
+  }
 
   return (
     <main className="!pt-0">
-
       <nav className="resume-nav">
         <a href="/" className="back-button">
           <img src="/icons/back.svg" alt="logo" className="w-2.5 h-2.5" />
@@ -71,14 +89,12 @@ const Resume = () => {
         </a>
       </nav>
 
-      {/* FULL HEIGHT LAYOUT */}
-      <div className="flex w-full h-screen overflow-hidden max-lg:flex-col-reverse">
+      <div className="flex w-full h-screen overflow-hidden">
 
-        {/* LEFT SIDE (STICKY RESUME PREVIEW) */}
+        {/* LEFT SIDE — PREVIEW */}
         <section
           className="
             w-1/2
-            max-lg:w-full
             h-screen
             sticky top-0
             flex items-center justify-center
@@ -112,11 +128,10 @@ const Resume = () => {
           </div>
         </section>
 
-        {/* RIGHT SIDE (SCROLLABLE REVIEW) */}
+        {/* RIGHT SIDE — FEEDBACK */}
         <section
           className="
             w-1/2
-            max-lg:w-full
             h-screen
             overflow-y-scroll
             px-6 py-10
